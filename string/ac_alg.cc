@@ -9,12 +9,14 @@ using namespace std;
 class AcNode {
 
 public:
-  char data_;
-  AcNode *children_[26];
-  bool isEndingChar_;
+  char data_; // AcNode char
+  bool isEndingChar_; // Ending pos
+  int length_; // Length of the string
+  AcNode *children_[26]; 
+  AcNode *fail; // fail pointer
 
   AcNode(char data='/') 
-  :data_(data),isEndingChar_(false){
+  :data_(data),isEndingChar_(false), length_(0){
     memset(children_, 0, sizeof(AcNode *)* 26);
   };
 };
@@ -34,8 +36,10 @@ public:
   void printTrie();
   void printTrieWithPrefix(string prefix);
   void destory(AcNode *p);
-  void dfs_traverse(AcNode *p, string buf, 
+  void dfsTraverse(AcNode *p, string buf, 
       vector<string> &tmp_str);
+  void bfsBuildFailPointer();
+  void match(string des);
 
 private:
   AcNode *root_;
@@ -74,10 +78,11 @@ void Trie::insert(string des) {
   }
 
   tmp->isEndingChar_ = true;
+  tmp->length_ = des.size();
 }
 
 // Traverse the trie tree recursion
-void Trie::dfs_traverse(AcNode *p, string buf, 
+void Trie::dfsTraverse(AcNode *p, string buf, 
                        vector<string> &tmp_str) {
   if (p == nullptr) {
     return;
@@ -91,7 +96,7 @@ void Trie::dfs_traverse(AcNode *p, string buf,
   for (int i = 0; i < 26; i++) {
     if (p->children_[i] != nullptr) {
       // Just add the prefix every time
-      dfs_traverse(p->children_[i], buf+(p->children_[i]->data_), tmp_str);
+      dfsTraverse(p->children_[i], buf+(p->children_[i]->data_), tmp_str);
     }
   }
 }
@@ -105,7 +110,7 @@ void Trie::printTrie() {
     string buff = "";
     if (root_->children_[i] != nullptr) {
       // Will be called recursion
-      dfs_traverse(root_->children_[i], 
+      dfsTraverse(root_->children_[i], 
           buff + root_->children_[i]->data_, tmp_str);
     }
   }
@@ -139,7 +144,7 @@ void Trie::printTrieWithPrefix(string start) {
     string buff = start;
     if (tmp->children_[i] != nullptr) {
       // Will be called recursion
-      dfs_traverse(tmp->children_[i], 
+      dfsTraverse(tmp->children_[i], 
           buff + tmp->children_[i]->data_, tmp_str);
     }
   }
@@ -176,4 +181,100 @@ bool Trie::find(string des) {
   }
 
   return true;
+}
+
+// Build the fail pointer in trie node.
+// The process is just like the next array in kmp alg.
+void Trie::bfsBuildFailPointer() {
+  queue<AcNode*> Q;
+  // Init the root fail pointer
+  root_->fail = nullptr;
+  Q.push(root_);
+
+  while (!Q.empty()) {
+    AcNode *tmp = Q.front();
+    Q.pop();
+    for (int i = 0;i < 26; i++ ) {
+      AcNode *pc = tmp->children_[i];
+      if (pc == nullptr) {
+        continue;
+      }
+
+      if (tmp == root_) {
+        pc->fail = nullptr;
+      } else {
+        AcNode *q = tmp->fail;
+        while(q != nullptr) {
+          AcNode *qc = q->children_[pc->data_ - 'a'];
+          if (qc != nullptr) {
+            pc -> fail = qc;
+            break;
+          }
+
+          // Let the fail pointer move forward
+          // Until the q->data_ == qc -> data_
+          //
+          // Just like the getNext in kmp, k = next[k],
+          // util you find the des[k+1] == des[i+1].
+          // Then you can make sure you have find the best 
+          // prefix in current string.
+          q = q->fail;
+        }
+
+        if (q == nullptr) {
+          pc -> fail = root_;
+        }
+      }
+
+      Q.push(pc);
+    }
+  }
+}
+
+void Trie::match(string des) {
+  AcNode *p = root_;
+  int des_len = des.size();
+  int i;
+
+  for (i = 0;i < des_len; i++) {
+    int index = des[i] - 'a';
+    while(p->children_[index] == nullptr && p != root_) {
+      p = p->fail;
+    }
+
+    p = p->children_[index];
+    if (p == nullptr) {
+      p = root_;
+    }
+
+    AcNode *tmp = p;
+    // Keep the tmp is not nullptr
+    while(tmp != nullptr && tmp != root_) {
+      if (tmp->isEndingChar_ == true) {
+        int pos = i - tmp->length_ + 1;
+        cout << "pos: " << pos << " len :" << tmp -> length_ << endl;
+      }
+      tmp = tmp -> fail;
+    }
+  }
+}
+
+int main() {
+  string s[5] = {"adafs", "dfgh", "amkil", "doikl", "aop"};
+
+  Trie *trie = new Trie();
+  
+  for (int i = 0; i < 5; i++) {
+    trie->insert(s[i]);
+  }
+  // Construct the fail pointer in trie tree
+  trie->bfsBuildFailPointer();
+
+  trie->printTrie();
+
+  string prefix_str;
+  cout << "Input a match string :" << endl;
+  cin >> prefix_str;
+  trie->match(prefix_str);
+  return 0;
 }
