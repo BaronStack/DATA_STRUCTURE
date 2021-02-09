@@ -192,8 +192,11 @@ void Trie::bfsBuildFailPointer() {
   Q.push(root_);
 
   while (!Q.empty()) {
+    // Get the first element from queue, the element will be 
+    // removed later
     AcNode *tmp = Q.front();
     Q.pop();
+    // Build the fail pointer relationship with ervery children_
     for (int i = 0;i < 26; i++ ) {
       AcNode *pc = tmp->children_[i];
       if (pc == nullptr) {
@@ -203,6 +206,9 @@ void Trie::bfsBuildFailPointer() {
       if (tmp == root_) {
         pc->fail = nullptr;
       } else {
+        // Check the tmp's children_ pc and q's children_ qc
+        // if they have the same char ,then  pc -> fail = qc
+        // Or, q while back to last fail pointer
         AcNode *q = tmp->fail;
         while(q != nullptr) {
           AcNode *qc = q->children_[pc->data_ - 'a'];
@@ -221,6 +227,8 @@ void Trie::bfsBuildFailPointer() {
           q = q->fail;
         }
 
+        // qc's char is not equal with pc'c char in all q's fail pointer
+        // keep pc's fail pointer to root_
         if (q == nullptr) {
           pc -> fail = root_;
         }
@@ -235,6 +243,7 @@ void Trie::match(string des) {
   AcNode *p = root_;
   int des_len = des.size();
   int i;
+  vector<pair<int,int>> match_vec;
 
   for (i = 0;i < des_len; i++) {
     int index = des[i] - 'a';
@@ -252,11 +261,33 @@ void Trie::match(string des) {
     while(tmp != nullptr && tmp != root_) {
       if (tmp->isEndingChar_ == true) {
         int pos = i - tmp->length_ + 1;
-        cout << "pos: " << pos << " len :" << tmp -> length_ << endl;
+        cout << "pos: " << pos << " len :" 
+          << tmp -> length_ << endl;
+        match_vec.push_back(make_pair(pos, tmp->length_));
       }
       tmp = tmp -> fail;
     }
   }
+
+  // Below is to output the replace result in with match str 
+  // in trie tree.
+  if (match_vec.size() == 0) {
+    cout << "string : " << des << 
+      " has no match str in trie tree!" << endl;
+    return;
+  }
+
+  int j = 0;
+  int tmp;
+  i = match_vec[j].first;
+  while(i < des_len && j < match_vec.size()) {
+    tmp = match_vec[j].second;
+    while(tmp --) {
+      des[i++] = '*';
+    }
+    j++;
+  }
+  cout << "string : " << des << " match !" << endl;
 }
 
 int main() {
