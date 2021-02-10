@@ -40,6 +40,7 @@ public:
       vector<string> &tmp_str);
   void bfsBuildFailPointer();
   void match(string des);
+  void matchLow(string des);
 
 private:
   AcNode *root_;
@@ -239,6 +240,7 @@ void Trie::bfsBuildFailPointer() {
   }
 }
 
+// Match the des string with fail pointer 
 void Trie::match(string des) {
   AcNode *p = root_;
   int des_len = des.size();
@@ -247,6 +249,7 @@ void Trie::match(string des) {
 
   for (i = 0;i < des_len; i++) {
     int index = des[i] - 'a';
+    // case2: try to match the des[i]，if failed，traverse
     while(p->children_[index] == nullptr && p != root_) {
       p = p->fail;
     }
@@ -280,6 +283,9 @@ void Trie::match(string des) {
   int j = 0;
   int tmp;
   i = match_vec[j].first;
+  // case1: check the des[i]'s fail pointer ,if the fail pointer
+  // is endingchar, and we will know that we have find a matching
+  // string, record it.
   while(i < des_len && j < match_vec.size()) {
     tmp = match_vec[j].second;
     while(tmp --) {
@@ -288,6 +294,33 @@ void Trie::match(string des) {
     j++;
   }
   cout << "string : " << des << " match !" << endl;
+}
+
+// Match trie str with traditional method.
+void Trie::matchLow(string des) {
+  vector<pair<int,int>> match_vec;
+  AcNode *tmp = root_;
+  int des_len = des.size();
+  int i = 0;
+
+  while(i < des_len) {
+    int index = des[i] - 'a';
+    AcNode *p = tmp->children_[index];
+
+    while(p != nullptr) {
+      i ++;
+      p = p->children_[des[i]-'a'];
+    }
+
+    if (p->isEndingChar_ == true) {
+      int pos = i - p->length_ + 1;
+      match_vec.push_back(make_pair(pos, p->length_));
+      cout << "pos: " << pos << " len :" 
+        << tmp -> length_ << endl;
+    } else {
+      i++;
+    }
+  }
 }
 
 int main() {
