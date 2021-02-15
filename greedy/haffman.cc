@@ -6,17 +6,17 @@
  
 using namespace std;
  
+// huffman node
 class Node {
   public:
-    char c;
-    int frequency;
-    Node *left;
-    Node *right;
-    int visit;
+    char c; // Target char
+    int frequency; // Char's num in input
+    Node *left; // left node
+    Node *right; // right node
  
-    Node(char _c, int f, Node *l = nullptr, Node *r = nullptr,
-         int vit = 0)
-      :c(_c), frequency(f), left(l), right(r),visit(vit) { }
+    Node(char _c, int f, Node *l = nullptr, 
+        Node *r = nullptr)
+      :c(_c), frequency(f), left(l), right(r) { }
  
     bool operator<(const Node &node) const { 
       return frequency > node.frequency;
@@ -33,7 +33,6 @@ void initNode(priority_queue<Node> &q,map<char, int> buf) {
   for (map<char, int>::iterator it = buf.begin();
                                 it != buf.end();
                                 it ++) {
-
     Node node(it->first, it->second);
     q.push(node);
   }
@@ -59,6 +58,10 @@ void huffmanTree(priority_queue<Node> &q) {
   }
 }
  
+// Huffman encode function
+// param1: Root is the huffman tree's root node
+// param2: prefix is the encode result per char
+// param3: a map with 'char' and it's huffman's encode
 void huffmanEncode(Node *root, string &prefix,
                  map<char, string> &result) {
   string m_prefix = prefix;
@@ -69,7 +72,6 @@ void huffmanEncode(Node *root, string &prefix,
   prefix += "0";
   if (root->left->left == nullptr) {
     result[root->left->c] = prefix;
-    //cout << root->left->c << ": " << prefix << endl;
   } else {
     huffmanEncode(root->left, prefix, result);
   }
@@ -79,12 +81,16 @@ void huffmanEncode(Node *root, string &prefix,
   prefix += "1";
   if (root->right->right == nullptr) {
     result[root->right->c] = prefix;
-    //cout << root->right->c << ": " << prefix << endl;
   } else {
     huffmanEncode(root->right, prefix, result);
   }
 }
 
+// Huffman decode function
+// param1: des is the input string to be decode
+// param2: res is the map between char and huffman's
+// encode string
+// param3: decode string
 bool huffmanDecode(string des, map <char, string> res,
                    string &result) {
   if (des == "") {
@@ -113,6 +119,7 @@ bool huffmanDecode(string des, map <char, string> res,
   return true;
 }
 
+// Print the encode result
 void testResult(map<char, string> result) {
   map<char, string>::const_iterator it = result.begin();
   while (it != result.end()) {
@@ -121,6 +128,8 @@ void testResult(map<char, string> result) {
   }
 }
 
+// Caculate the char's frequency and put result into 
+// a map.
 void initInput(string des, map<char, int> &buf) {
   if (des.size() == 0) {
     return;
