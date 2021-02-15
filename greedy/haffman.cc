@@ -59,7 +59,7 @@ void huffmanTree(priority_queue<Node> &q) {
   }
 }
  
-void huffmanCode(Node *root, string &prefix,
+void huffmanEncode(Node *root, string &prefix,
                  map<char, string> &result) {
   string m_prefix = prefix;
  
@@ -71,7 +71,7 @@ void huffmanCode(Node *root, string &prefix,
     result[root->left->c] = prefix;
     //cout << root->left->c << ": " << prefix << endl;
   } else {
-    huffmanCode(root->left, prefix, result);
+    huffmanEncode(root->left, prefix, result);
   }
  
   prefix = m_prefix;
@@ -81,49 +81,36 @@ void huffmanCode(Node *root, string &prefix,
     result[root->right->c] = prefix;
     //cout << root->right->c << ": " << prefix << endl;
   } else {
-    huffmanCode(root->right, prefix, result);
+    huffmanEncode(root->right, prefix, result);
   }
 }
 
-bool huffmanDecode(Node *root, string des,
+bool huffmanDecode(string des, map <char, string> res,
                    string &result) {
-  if (des == "" || root == nullptr) {
+  if (des == "") {
     return false;
   }
 
-  Node *tmp = root; 
   int i;
-  for (i = 0; i < des.size();) {
-    if (des[i] == '0' && tmp -> left != nullptr) {
-      tmp = tmp -> left;
-      i++;
-    }
-    if (des[i] == '1' && tmp -> right != nullptr) {
-      tmp = tmp -> right;
-      i++;
-    }
+  map<char,string>::const_iterator it;
+  string buf_str = "";
 
-    if (des[i] != '0' && des[i] != '1') {
-      break;
-    }
-
-    if(tmp -> left == nullptr && 
-       tmp -> right == nullptr) {
-      if (tmp -> visit == 0) {
-        result += tmp -> c;
-        tmp->visit = 1;
-        tmp = root;
-      } else {
+  for (i = 0; i < des.size(); i ++) {
+    buf_str += des[i];
+    for (it = res.begin() ; it != res.end(); it++ ) {
+      if (it->second == buf_str) {
+        result += it->first; 
+        buf_str = "";
         break;
       }
     }
+
+    if(i == des.size() - 1 && it == res.end()) {
+      return false;
+    }
   }
   
-  if(i == des.size() - 1 && tmp == nullptr) {
-    return true;
-  } else {
-    return false;
-  }
+  return true;
 }
 
 void testResult(map<char, string> result) {
@@ -164,18 +151,18 @@ int main() {
   string prefix = "";
   map<char, string> result;
   // finish the huffman encode 
-  huffmanCode(&root, prefix, result);
+  huffmanEncode(&root, prefix, result);
  
   // print encode's result for every letter
   testResult(result);
 
   string decode_des;
-  string res;
+  string res="";
 
   cout << "Input decode string : " << endl;
   cin >> decode_des;
   
-  if(huffmanDecode(&root, decode_des, res)) {
+  if(huffmanDecode(decode_des, result, res)) {
     cout << "decode res: " << res << endl;
   } else {
     cout << "decode res is false ! " <<  res << endl;
