@@ -10,31 +10,28 @@ typedef struct AvlNode{
   int data;
   struct AvlNode *left = nullptr;
   struct AvlNode *right = nullptr;
-
-//   AvlTree() {
-//     left = nullptr;
-//     right = nullptr;
-//   }
 }AvlTree, *TreeNode;
 
-// void create_avltree(TreeNode *root,
-//                     AvlTree *node) {
-//   if (node -> data >= (*root) -> data) {
-//     if((*root) -> left != nullptr) {
-//       create_avltree(&(*root) -> left, node);
-//     } else {
-//       (*root) -> left = node;
-//     }
-//   } else {
-//     if ((*root) -> right != nullptr) {
-//       create_avltree(&(*root) -> right, node);
-//     } else {
-//       (*root) -> right = node;
-//     }
-//   }
-// }
+// Avl Tree : Binary search tree
+class AvlAPI{
+public:
+  AvlAPI();
+  ~AvlAPI();
 
-void create_avltree(TreeNode *node, AvlTree *insert) {
+  void create_avltree(TreeNode *node, AvlTree *insert);
+  bool search(AvlTree *root, int target);
+  void insert_avltree(TreeNode *node);
+  void preOrder(AvlTree *node, int layer);
+  void destory(AvlTree *node);
+
+  TreeNode root_;
+};
+
+// Construct a AvlTree with a TreeNode input.
+// Two rules:
+// 1. Left node is less than the parent's value
+// 2. Right node is bigger than the parent's value
+void AvlAPI::create_avltree(TreeNode *node, AvlTree *insert) {
   if ((*node) -> data > insert -> data) {
     if ((*node) -> left) {
       create_avltree(&(*node) ->left,insert);
@@ -50,7 +47,11 @@ void create_avltree(TreeNode *node, AvlTree *insert) {
   }
 }
 
-bool search(AvlTree *root, int val) {
+// Search a value in avl tree.
+// Compare with the parent's value ,if it is bigger than
+// parent's value, it's better to compare the parent's right.
+// Else ,compare target with the parent's left.
+bool AvlAPI::search(AvlTree *root, int val) {
   if(val == root -> data) {
     return true;
   } 
@@ -70,7 +71,8 @@ bool search(AvlTree *root, int val) {
   }
 }
 
-void insert_avltree(TreeNode *root) {
+// Insert a tree node into avl tree
+void AvlAPI::insert_avltree(TreeNode *root) {
   int node_num;
   cout << "Input node nums: " << endl;
   cin >> node_num;
@@ -84,7 +86,8 @@ void insert_avltree(TreeNode *root) {
   }
 }
 
-void preOrder(AvlTree *root, int layer) {
+// Preorder traverse the whole tree.
+void AvlAPI::preOrder(AvlTree *root, int layer) {
   if (root == nullptr) {
     return;
   }
@@ -96,23 +99,53 @@ void preOrder(AvlTree *root, int layer) {
   preOrder(root -> right, layer + 1);
 }
 
-int main() {
-  TreeNode root;
-  root = (AvlTree *)malloc(sizeof(AvlTree));
-  root -> data = 8;
-  root -> left = nullptr;
-  root -> right = nullptr;
+AvlAPI::~AvlAPI() {
+  if (root_ != nullptr) {
+    destory(root_);
+  }
+}
 
-  insert_avltree(&root);
+// Destory function to release the space
+void AvlAPI::destory(AvlTree *root) {
+  if (root == nullptr) {
+    return;
+  }
+
+  if (root -> left != nullptr) {
+    destory(root->left);
+    free(root->left);
+    root -> left = nullptr;
+  } else if(root -> right != nullptr) {
+    destory(root -> right);
+    free(root -> right);
+    root -> right = nullptr;
+  }
+}
+
+// Init the avl tree
+// For every user, you need let him know the 
+// foundation element. So that other nodes could 
+// compare with it.
+AvlAPI::AvlAPI() {
+  root_ = (AvlTree *)malloc(sizeof(AvlTree));
+  root_ -> data = 8;
+  root_ -> left = nullptr;
+  root_ -> right = nullptr;
+}
+
+int main() {
+  AvlAPI avltree;
+
+  avltree.insert_avltree(&avltree.root_);
 
   cout << "Preorder :" << endl;
-  preOrder(root, 0);
+  avltree.preOrder(avltree.root_, 0);
 
   int target;
   cout << "Input the target num :" << endl;
   cin >> target;
   
-	string s = (search(root, target)==1)?"success":"failed";
+  string s = (avltree.search(avltree.root_, target)==1)?"success":"failed";
   cout << "\nsearch " << target << " in tree "<< s << endl;
 
   return 0;
