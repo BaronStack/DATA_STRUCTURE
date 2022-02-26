@@ -7,17 +7,17 @@
  * };
  */
 class Solution {
-public:
-    ListNode* getKthFromEnd(ListNode* head, int k) {
-        ListNode* fast = head;
-        while (fast) {
-            fast = fast->next;
-            if (k == 0) {
-                head = head->next;
-            } else {
-                k --;
-            }
-        }
-        return head;
+ public:
+  ListNode* getKthFromEnd(ListNode* head, int k) {
+    ListNode* fast = head;
+    while (fast) {
+      fast = fast->next;
+      if (k == 0) {
+        head = head->next;
+      } else {
+        k--;
+      }
     }
+    return head;
+  }
 };

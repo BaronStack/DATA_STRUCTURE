@@ -1,20 +1,21 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <iostream>
 #include <stack>
 #include <vector>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 using namespace std;
 
-typedef struct AvlNode{
+typedef struct AvlNode {
   int data;
   struct AvlNode *left = nullptr;
   struct AvlNode *right = nullptr;
-}AvlTree, *TreeNode;
+} AvlTree, *TreeNode;
 
 // Avl Tree : Binary search tree
-class AvlAPI{
-public:
+class AvlAPI {
+ public:
   AvlAPI();
   ~AvlAPI();
 
@@ -32,17 +33,17 @@ public:
 // 1. Left node is less than the parent's value
 // 2. Right node is bigger than the parent's value
 void AvlAPI::create_avltree(TreeNode *node, AvlTree *insert) {
-  if ((*node) -> data > insert -> data) {
-    if ((*node) -> left) {
-      create_avltree(&(*node) ->left,insert);
+  if ((*node)->data > insert->data) {
+    if ((*node)->left) {
+      create_avltree(&(*node)->left, insert);
     } else {
-      (*node) -> left = insert;
+      (*node)->left = insert;
     }
   } else {
-    if ((*node)  -> right) {
-      create_avltree(&(*node) ->right, insert);
+    if ((*node)->right) {
+      create_avltree(&(*node)->right, insert);
     } else {
-      (*node)  -> right = insert;
+      (*node)->right = insert;
     }
   }
 }
@@ -52,19 +53,19 @@ void AvlAPI::create_avltree(TreeNode *node, AvlTree *insert) {
 // parent's value, it's better to compare the parent's right.
 // Else ,compare target with the parent's left.
 bool AvlAPI::search(AvlTree *root, int val) {
-  if(val == root -> data) {
+  if (val == root->data) {
     return true;
-  } 
+  }
 
-  if(val < root -> data) {
-    if (root -> left != nullptr) {
-      return search(root -> left, val);
+  if (val < root->data) {
+    if (root->left != nullptr) {
+      return search(root->left, val);
     } else {
       return false;
     }
   } else {
-    if (root -> right != nullptr) {
-      return search(root -> right, val);
+    if (root->right != nullptr) {
+      return search(root->right, val);
     } else {
       return false;
     }
@@ -77,11 +78,11 @@ void AvlAPI::insert_avltree(TreeNode *root) {
   cout << "Input node nums: " << endl;
   cin >> node_num;
 
-  for (int i = 0;i < node_num; i++) {
+  for (int i = 0; i < node_num; i++) {
     int tmp;
     cin >> tmp;
     AvlTree *node = (AvlTree *)malloc(sizeof(AvlTree));
-    node -> data = tmp;
+    node->data = tmp;
     create_avltree(&(*root), node);
   }
 }
@@ -91,12 +92,12 @@ void AvlAPI::preOrder(AvlTree *root, int layer) {
   if (root == nullptr) {
     return;
   }
-  for (int i = 0;i < layer; ++i) {
+  for (int i = 0; i < layer; ++i) {
     cout << "----";
   }
-  cout << root -> data << endl;
-  preOrder(root -> left,layer + 1);
-  preOrder(root -> right, layer + 1);
+  cout << root->data << endl;
+  preOrder(root->left, layer + 1);
+  preOrder(root->right, layer + 1);
 }
 
 AvlAPI::~AvlAPI() {
@@ -111,26 +112,26 @@ void AvlAPI::destory(AvlTree *root) {
     return;
   }
 
-  if (root -> left != nullptr) {
+  if (root->left != nullptr) {
     destory(root->left);
     free(root->left);
-    root -> left = nullptr;
-  } else if(root -> right != nullptr) {
-    destory(root -> right);
-    free(root -> right);
-    root -> right = nullptr;
+    root->left = nullptr;
+  } else if (root->right != nullptr) {
+    destory(root->right);
+    free(root->right);
+    root->right = nullptr;
   }
 }
 
 // Init the avl tree
-// For every user, you need let him know the 
-// foundation element. So that other nodes could 
+// For every user, you need let him know the
+// foundation element. So that other nodes could
 // compare with it.
 AvlAPI::AvlAPI() {
   root_ = (AvlTree *)malloc(sizeof(AvlTree));
-  root_ -> data = 8;
-  root_ -> left = nullptr;
-  root_ -> right = nullptr;
+  root_->data = 8;
+  root_->left = nullptr;
+  root_->right = nullptr;
 }
 
 int main() {
@@ -144,9 +145,10 @@ int main() {
   int target;
   cout << "Input the target num :" << endl;
   cin >> target;
-  
-  string s = (avltree.search(avltree.root_, target)==1)?"success":"failed";
-  cout << "\nsearch " << target << " in tree "<< s << endl;
+
+  string s =
+      (avltree.search(avltree.root_, target) == 1) ? "success" : "failed";
+  cout << "\nsearch " << target << " in tree " << s << endl;
 
   return 0;
 }

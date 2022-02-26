@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
@@ -9,11 +9,10 @@ using namespace std;
 // five candies size:   4 2 5 7 9
 //
 // Greedy algorithm is suitable to solve the problem.
-// We can let the smaller candy's size to satisfy the 
+// We can let the smaller candy's size to satisfy the
 // smaller resquest of child.
-int distributeCandy(vector<int> candies,
-    vector<int> childs) {
-  if(candies.size() == 0 || childs.size() == 0) {
+int distributeCandy(vector<int> candies, vector<int> childs) {
+  if (candies.size() == 0 || childs.size() == 0) {
     return 0;
   }
 
@@ -23,11 +22,10 @@ int distributeCandy(vector<int> candies,
 
   int res = 0;
   int i, j;
-  
-  for (i = 0, j = 0;i < childs.size() && 
-      j < candies.size(); i++,j++) {
+
+  for (i = 0, j = 0; i < childs.size() && j < candies.size(); i++, j++) {
     if (childs[i] <= candies[j]) {
-      res ++;
+      res++;
     }
   }
 
@@ -35,11 +33,10 @@ int distributeCandy(vector<int> candies,
 }
 
 int main() {
-  vector<int> candies = {4,2,5,7,9};
-  vector<int> childs = {1,1,3,2,2,8};
+  vector<int> candies = {4, 2, 5, 7, 9};
+  vector<int> childs = {1, 1, 3, 2, 2, 8};
 
-  cout << "satisfied childs' num is " 
-       << distributeCandy(candies, childs) 
+  cout << "satisfied childs' num is " << distributeCandy(candies, childs)
        << endl;
   return 0;
 }

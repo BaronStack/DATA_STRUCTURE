@@ -5,17 +5,18 @@
 // 如果想让整个面积最大，移动的时候需要保留较高的元素，
 // 较低的元素的部分可以进行移动。
 class Solution {
-public:
-    int maxArea(vector<int>& height) {
-        int size = height.size();
-        int l = 0, r = size - 1;
-        int area = 0;
-        while (l < r) {
-            area = max(area, (r - l) * min(
-                       height[l], height[r]));
-            if (height[l] > height[r]) r --;
-            else l++;
-        }
-        return area;
+ public:
+  int maxArea(vector<int>& height) {
+    int size = height.size();
+    int l = 0, r = size - 1;
+    int area = 0;
+    while (l < r) {
+      area = max(area, (r - l) * min(height[l], height[r]));
+      if (height[l] > height[r])
+        r--;
+      else
+        l++;
     }
+    return area;
+  }
 };
